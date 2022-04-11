@@ -51,4 +51,4 @@ import ThreeSixty from 'react-360-view-simple'
 - [vue](https://reactjs.org/)
 - [core-js](https://github.com/zloirock/core-js)
 - [Cloud Image](https://www.cloudimage.io/)
-- [React 360] (https://github.com/rajeevgade/react-360)
+- [React 360](https://github.com/rajeevgade/react-360)
