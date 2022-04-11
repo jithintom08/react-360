@@ -1,19 +1,14 @@
 import React, { Component } from "react";
-import Button from './components/Button'
 import './style.css'
-
-import Hammer from 'react-hammerjs';
 
 class React360Viewer extends Component {
 
     constructor() {
         super();
-        //this.imageContainerRef = React.createRef();
         this.viewPercentageRef = React.createRef();
         this.viewPortElementRef = React.createRef();
         this.canvas = null
         this.ctx = null
-        this.isMobile = false
         this.imageData = []
         this.images = []
         this.loadedImages = 0
@@ -32,14 +27,9 @@ class React360Viewer extends Component {
         this.state = {
             lastX: 0,
             lastY: 0,
-            minScale: 0.5,
-            maxScale: 4,
             scale: 0.2,
-            customOffset: 10,
-            currentScale: 1,
             currentTopPosition: 0,
             currentLeftPosition: 0,
-            selectMenuOption: 1,
             currentImage: null,
             dragging: false,
             canvas: null,
@@ -54,21 +44,12 @@ class React360Viewer extends Component {
             speedFactor: 13,
             activeImage: 1,
             stopAtEdges: false,
-            panmode: false,
-            currentLoop: 0,
-            loopTimeoutId: 0,
-            playing: false,
             imagesLoaded: false
         }
-
-        //this.currentLeftPosition = this.currentLeftPosition.bind(this)
     }
 
     componentDidMount(){
-        this.disableZoomin()
-
         this.viewerPercentage = this.viewPercentageRef.current
-        //console.log(this.viewerContainerRef.getElementsByClassName('v360-viewport-container'))
         this.viewPortElementRef = this.viewerContainerRef.getElementsByClassName('v360-viewport-container')[0]
         this.fetchData()
     }
@@ -93,7 +74,6 @@ class React360Viewer extends Component {
     preloadImages() {
         if (this.imageData.length) {
             try {
-                //this.props.amount = this.imageData.length;
                 this.imageData.forEach(src => {
                     this.addImage(src);
                 });
@@ -108,7 +88,6 @@ class React360Viewer extends Component {
     addImage(resultSrc){
         const image = new Image();
         image.src = resultSrc;
-        //image.crossOrigin='anonymous'
         image.onload = this.onImageLoad.bind(this);
         image.onerror = this.onImageLoad.bind(this);
         this.images.push(image);
@@ -121,21 +100,12 @@ class React360Viewer extends Component {
         if (this.loadedImages === this.props.amount) {
             this.onAllImagesLoaded(event);
         } else if (this.loadedImages === 1) {
-            //this.onFirstImageLoaded(event);
             console.log('load first image')
         }
     }
 
     updatePercentageInLoader(percentage) {
-        /* if (this.loader) {
-            this.loader.style.width = percentage + '%';
-        }
-        if (this.view360Icon) {
-            this.view360Icon.innerText = percentage + '%';
-        } */
-        //console.log(percentage)
         this.viewerPercentage.innerHTML = percentage + '%';
-        //console.log(percentage + '%')
     }
 
     onAllImagesLoaded(e){
@@ -145,43 +115,15 @@ class React360Viewer extends Component {
     }
 
     initData(){
-        //console.log(this.imageContainerRef)
         this.canvas = this.imageContainerRef
         this.ctx = this.canvas.getContext('2d')
-        //console.log('initialize data here')
 
         this.attachEvents();
-
-        this.checkMobile()
         this.loadInitialImage()
-
-        this.setState({ playing: this.props.autoplay })
     }
 
     attachEvents(){
-        if(this.state.panmode){
-            this.bindPanModeEvents()
-        }else{
-            this.bind360ModeEvents()
-        }
-    }
-
-    bindPanModeEvents(){
-        this.viewPortElementRef.removeEventListener('touchend', this.touchEnd);
-        this.viewPortElementRef.removeEventListener('touchstart', this.touchStart);
-        this.viewPortElementRef.removeEventListener('touchmove', this.touchMove); 
-
-        this.viewPortElementRef.addEventListener('touchend', this.stopDragging);
-        this.viewPortElementRef.addEventListener('touchstart', this.startDragging);
-        this.viewPortElementRef.addEventListener('touchmove', this.doDragging); 
-
-        this.viewPortElementRef.removeEventListener('mouseup', this.stopMoving);
-        this.viewPortElementRef.removeEventListener('mousedown', this.startMoving);
-        this.viewPortElementRef.removeEventListener('mousemove', this.doMoving); 
-        
-        this.viewPortElementRef.addEventListener('mouseup', this.stopDragging);
-        this.viewPortElementRef.addEventListener('mousedown', this.startDragging);
-        this.viewPortElementRef.addEventListener('mousemove', this.doDragging);
+        this.bind360ModeEvents()
     }
     
     bind360ModeEvents(){
@@ -211,17 +153,10 @@ class React360Viewer extends Component {
     }
 
     setLastPositions(evt){
-        if(this.isMobile){
-            this.setState({ 
-                lastX: evt.touches[0].offsetX || (evt.touches[0].pageX - this.canvas.offsetLeft),
-                lastY: evt.touches[0].offsetY || (evt.touches[0].pageY - this.canvas.offsetTop)
-            })
-        }else{
-            this.setState({ 
-                lastX: evt.offsetX || (evt.pageX - this.canvas.offsetLeft),
-                lastY: evt.offsetY || (evt.pageY - this.canvas.offsetTop) 
-            })
-        }
+        this.setState({ 
+            lastX: evt.offsetX || (evt.pageX - this.canvas.offsetLeft),
+            lastY: evt.offsetY || (evt.pageY - this.canvas.offsetTop) 
+        })
     }
 
     doDragging = (evt) => {
@@ -239,10 +174,6 @@ class React360Viewer extends Component {
     stopDragging = (evt) => {
         this.dragging = false
         this.dragStart = null
-    }
-
-    checkMobile(){
-        this.isMobile = !!('ontouchstart' in window || navigator.msMaxTouchPoints);
     }
 
     loadInitialImage(){
@@ -360,33 +291,6 @@ class React360Viewer extends Component {
         
     }
 
-    prev = (e) => {
-        //console.log(this.currentLeftPosition)
-        /* this.setState({
-            currentLeftPosition: 10
-        }) */
-        //this.currentLeftPosition = 10
-        (this.props.spinReverse) ? this.turnRight() : this.turnLeft()
-    }
-
-    next = (e) => {
-        (this.props.spinReverse) ? this.turnLeft() : this.turnRight()
-    }
-
-    resetPosition = () => {
-        this.currentScale = 1
-        this.activeImage = 1
-        this.setImage(true)
-    }
-
-    turnLeft(){
-        this.moveActiveIndexDown(1);
-    }
-
-    turnRight(){
-        this.moveActiveIndexUp(1);
-    }
-
     moveActiveIndexUp(itemsSkipped) {
         if (this.stopAtEdges) {
             if (this.activeImage + itemsSkipped >= this.props.amount) {
@@ -424,76 +328,6 @@ class React360Viewer extends Component {
         this.currentCanvasImage = image
         this.redraw()
     }
-
-    zoomImage = (evt) => {
-        this.setState({ 
-            lastX: evt.offsetX || (evt.pageX - this.canvas.offsetLeft),
-            lastY: evt.offsetY || (evt.pageY - this.canvas.offsetTop)
-        })
-        
-        var delta = evt.wheelDelta ? evt.wheelDelta/40 : evt.deltaY ? -evt.deltaY : 0;
-        
-        if (delta) this.zoom(delta);
-        //return evt.preventDefault() && false;
-            
-    }
-
-    zoomIn = (evt) => {
-        this.setState({ 
-            lastX: this.centerX,
-            lastY: this.centerY
-        })
-        //this.lastY = this.centerY
-        this.zoom(2)
-    }
-    zoomOut = (evt) => {
-        this.setState({ 
-            lastX: this.centerX,
-            lastY: this.centerY
-        })
-        this.zoom(-2)
-    }
-
-    zoom(clicks){
-        //console.log(this.lastX + ' - ' + this.lastY)
-        let factor = Math.pow(1.01,clicks);
-        //console.log(factor)
-        if(factor > 1){
-            this.currentScale += factor
-        }else{
-            if(this.currentScale-factor > 1)
-                this.currentScale -= factor
-            else
-                this.currentScale = 1
-        }
-        
-        if(this.currentScale > 1){
-            let pt = this.ctx.transformedPoint(this.state.lastX,this.state.lastY);
-            this.ctx.translate(pt.x,pt.y);
-            
-            //console.log(this.currentScale)
-            this.ctx.scale(factor,factor);
-            this.ctx.translate(-pt.x,-pt.y);
-            this.redraw();
-        }
-    }
-
-    disableZoomin(){
-        document.addEventListener("gesturestart", function (e) {
-          e.preventDefault();
-            document.body.style.zoom = 0.99;
-        });
-        document.addEventListener("gesturechange", function (e) {
-          e.preventDefault();
-          document.body.style.zoom = 0.99;
-        });
-        
-        document.addEventListener("gestureend", function (e) {
-            e.preventDefault();
-            document.body.style.zoom = 1;
-        });
-    }
-
 
     onMove(pageX){
         if (pageX - this.movementStart >= this.speedFactor) {
@@ -549,169 +383,23 @@ class React360Viewer extends Component {
         this.movementStart = 0
     }
 
-    play = (e) => {
-        this.setState({
-            loopTimeoutId: window.setInterval(() => this.loopImages(), 100)
-        })
-    }
-
-    onSpin() {
-        if (this.state.playing || this.state.loopTimeoutId) {
-            this.stop();
-        }
-    }
-
-    stop() {
-        if(this.activeImage === 1){
-            this.setState({ currentLoop: 0 })
-        }
-        this.setState({ playing: false })
-        window.clearTimeout(this.state.loopTimeoutId);
-    }
-
-    loopImages() {
-        let loop = (this.props.loop) ? this.props.loop : 1
-
-        if(this.activeImage === 1){
-            if(this.state.currentLoop === loop){
-                this.stop()
-            }
-            else{
-                this.setState({ currentLoop: this.state.currentLoop + 1 })
-                
-                this.next()
-            }
-        }
-        else{
-            this.next()
-        }
-    }
-
-    togglePlay = (e) => {
-        this.setState({ playing: !this.state.playing })
-    }
-
-    togglePanMode = (e) => {
-        this.setState({ panmode: !this.state.panmode })
-    }
-
-    toggleFullScreen = (e) => {
-        this.setState({ isFullScreen: !this.state.isFullScreen })
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        if(this.state.currentLeftPosition !== prevState.currentLeftPosition){
-            console.log('Left Position Changed')
-        }
-
-        if(this.state.panmode !== prevState.panmode){
-            this.attachEvents()
-        }
-
-        if(this.state.playing !== prevState.playing){
-            if(!this.state.playing){
-                this.stop()
-            }else{
-                this.play()
-            }
-        }
-
-        if(this.state.isFullScreen !== prevState.isFullScreen){
-            if(!this.state.isFullScreen){
-                //exit full screen
-                this.viewerContainerRef.classList.remove('v360-main')
-                this.viewerContainerRef.classList.remove('v360-fullscreen')
-            }else{
-                //enter full screen
-                this.viewerContainerRef.classList.add('v360-main')
-                this.viewerContainerRef.classList.add('v360-fullscreen')
-                
-            }
-            this.setImage()
-        }
-    }
-
-    handlePinch = (e) => {
-        if (e.scale < this.currentScale) {
-        // zoom in
-            this.zoomIn();
-        } else if (e.scale > this.currentScale) {
-        // zoom out
-            this.zoomOut();
-        }
-
-        //lastScale = e.scale;
-    }
-
-    pinchOut = () => {
-        this.currentScale = 1
-    }
-
     render() {
         
         return (
             <div>
-                <div className="v360-viewer-container" ref={(inputEl) => {this.viewerContainerRef = inputEl}} id="identifier" onWheel={(e) => this.zoomImage(e)}>
+                <div className="v360-viewer-container" ref={(inputEl) => {this.viewerContainerRef = inputEl}} id="identifier" >
 
                     {!this.state.imagesLoaded ? 
                     <div className="v360-viewport">
                         <div className="v360-spinner-grow"></div>
                         <p ref={this.viewPercentageRef} className="v360-percentage-text"></p>
                     </div> : '' }
-
-                    <Hammer onPinchIn={this.handlePinch} onPinchOut={this.handlePinch} onPinchEnd={this.pinchOut}
-                        options={{
-                        recognizers: {
-                            pinch: { enable: true }
-                        }
-                    }}>
-                        <div className="v360-viewport-container v360-viewport">
-                            <canvas 
-                                className="v360-image-container" 
-                                ref={(inputEl) => {this.imageContainerRef = inputEl}} 
-                            ></canvas>
-                            {this.props.boxShadow ? <div className="v360-product-box-shadow"></div> : ''}
-                        </div>
-                    </Hammer>
-
-                    <abbr title="Fullscreen Toggle">
-                        <div className="v360-fullscreen-toggle text-center" onClick={this.toggleFullScreen}>
-                            <div className={this.props.buttonClass === 'dark' ? 'v360-fullscreen-toggle-btn text-light' : 'v360-fullscreen-toggle-btn text-dark'}>
-                                <i className={!this.state.isFullScreen ? 'fas fa-expand text-lg' : 'fas fa-compress text-lg'}></i>
-                            </div>
-                        </div>
-                    </abbr>
-                    
-                    <div id="v360-menu-btns" className={this.props.buttonClass}>
-                        <div className="v360-navigate-btns">
-                            <Button 
-                                clicked={this.togglePlay} 
-                                icon={this.state.playing ? 'fa fa-pause' : 'fa fa-play'} 
-                            />
-                            <Button 
-                                clicked={this.zoomIn} 
-                                icon="fa fa-search-plus" 
-                            />
-                            <Button 
-                                clicked={this.zoomOut} 
-                                icon="fa fa-search-minus" 
-                            />
-
-                            {this.state.panmode ? <Button clicked={this.togglePanMode} text="360&deg;"/> : <Button clicked={this.togglePanMode} icon="fa fa-hand-paper"/>}
-
-                            <Button 
-                                clicked={this.prev} 
-                                icon="fa fa-chevron-left" 
-                            />
-                            <Button 
-                                clicked={this.next} 
-                                icon="fa fa-chevron-right" 
-                            />
-                            <Button 
-                                clicked={this.resetPosition} 
-                                icon="fa fa-sync" 
-                            />
-                        </div>
+                    <div className="v360-viewport-container v360-viewport">
+                        <canvas 
+                            className="v360-image-container" 
+                            ref={(inputEl) => {this.imageContainerRef = inputEl}} 
+                        ></canvas>
+                        {this.props.boxShadow ? <div className="v360-product-box-shadow"></div> : ''}
                     </div>
                 </div>
             </div>
