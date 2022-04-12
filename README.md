@@ -1,5 +1,5 @@
-# react-360-view
-- A Very Simple and Beautiful 360&deg; Product Viewer built on React.js
+# react-360-view-simple
+- A very simple yet still beautiful 360&deg; product viewer built on React.js
 - This is a simplied version of https://github.com/rajeevgade/react-360
 
 ## Features
