@@ -136,10 +136,12 @@ class React360Viewer extends Component {
         this.viewPortElementRef.addEventListener('touchmove', this.touchMove); 
 
         this.viewPortElementRef.removeEventListener('mouseup', this.stopDragging);
+        this.viewPortElementRef.removeEventListener('mouseout', this.stopDragging);
         this.viewPortElementRef.removeEventListener('mousedown', this.startDragging);
         this.viewPortElementRef.removeEventListener('mousemove', this.doDragging); 
         
         this.viewPortElementRef.addEventListener('mouseup', this.stopMoving);
+        this.viewPortElementRef.addEventListener('mouseout', this.stopMoving);
         this.viewPortElementRef.addEventListener('mousedown', this.startMoving);
         this.viewPortElementRef.addEventListener('mousemove', this.doMoving);
     }
