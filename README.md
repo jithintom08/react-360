@@ -4,7 +4,7 @@
 
 ## Features
 
-- 360&deg; View
+- Mouse drag 360&deg; view
 
 
 ## Installation
