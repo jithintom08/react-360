@@ -286,7 +286,7 @@ var React360Viewer = /*#__PURE__*/function (_Component) {
 
       if (!cached) {
         this.currentCanvasImage = new Image();
-        this.currentCanvasImage.crossOrigin = 'anonymous';
+       // this.currentCanvasImage.crossOrigin = 'anonymous';
         this.currentCanvasImage.src = this.currentImage;
 
         this.currentCanvasImage.onload = function () {
