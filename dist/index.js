@@ -235,7 +235,7 @@ var React360Viewer = /*#__PURE__*/function (_Component) {
     key: "initData",
     value: function initData() {
       this.canvas = this.imageContainerRef;
-      this.ctx = this.canvas.getContext('2d');
+      this.ctx = this.canvas?.getContext('2d');
       this.attachEvents();
       this.loadInitialImage();
     }
